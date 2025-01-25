@@ -169,3 +169,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+bot/database/GP_warehouse.db
