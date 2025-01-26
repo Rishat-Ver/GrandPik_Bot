@@ -7,3 +7,7 @@ class SearchStates(StatesGroup):
 
 class AddStates(StatesGroup):
     waiting_for_add_input = State()
+
+
+class DeleteStates(StatesGroup):
+    waiting_for_delete_input = State()

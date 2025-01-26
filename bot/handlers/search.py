@@ -6,6 +6,7 @@ from aiogram.filters import Command
 from database.crud.read_data import get_items
 from keyboards.default import main_keyboard
 from handlers.states import SearchStates
+from checkers.checker_params import chek_params_integer
 
 router_search = Router()
 
@@ -13,7 +14,12 @@ router_search = Router()
 @router_search.message(lambda message: message.text == "Найти")
 async def search_prompt(message: Message, state: FSMContext):
 
-    await message.reply("Введите данные в формате:\n\n<артикул><ПРОБЕЛ><размер>\n<артикул><ПРОБЕЛ><размер>\nи т д")
+    await message.answer(
+        f"Введите данные в формате:\n\n"
+        f"артикул␣размер\n"
+        f"артикул␣размер\n"
+        f"и т д"
+        )
     await state.set_state(SearchStates.waiting_for_search_input)
 
 
@@ -26,10 +32,20 @@ async def process_search(message: Message, state: FSMContext):
 
         if len(item.split()) == 2:
             article, size = item.split()
+
+            if not chek_params_integer(article):
+                result.append(
+                    f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
+                    f"Не корректно ввели данные\n"
+                    f"Артикул - {article}\n"
+                )
+                continue
+
             object = get_items(article, size)
             if object:
                 result.append(
                     "\n".join([
+                        f"✅\n"
                         f"Артикул: {item[1]}\n"
                         f"Размер: {item[2]}\n"
                         f"Кол-во: {item[3]}\n"
@@ -38,9 +54,17 @@ async def process_search(message: Message, state: FSMContext):
                     ])
                 )
             else:
-                result.append(f'Артикул: {article}\nРазмер: {size}\nНет такого тавара')
+                result.append(
+                    f'Артикул: {article}\n'
+                    f'Размер: {size}\n'
+                    f'Нет такого тавара'
+                    )
         else:
-            result.append(f'{item}\nФормат данных неверный.\nВведите: <артикул><ПРОБЕЛ><размер>.')
+            result.append(
+                f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
+                f'Формат данных неверный.\n'
+                f'Введите: артикул␣размер.'
+                )
 
     await message.reply('\n---------------------------\n'.join(result), reply_markup=main_keyboard)
     await state.clear()

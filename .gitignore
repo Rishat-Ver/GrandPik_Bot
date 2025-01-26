@@ -171,3 +171,4 @@ cython_debug/
 .pypirc
 
 bot/database/GP_warehouse.db
+GP_warehouse.db

@@ -3,38 +3,39 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 from keyboards.default import main_keyboard
-from database.crud.add_date import add_or_update_item
-from handlers.states import AddStates
+from database.crud.del_data import update_item_for_delete
+from handlers.states import DeleteStates
 from checkers.checker_params import chek_params_integer
 
 
-router_add_item = Router()
+router_delete_item = Router()
 
 
-@router_add_item.message(lambda message: message.text == "Обновить/Добавить")
-async def add_prompt(message: Message, state: FSMContext):
+@router_delete_item.message(lambda message: message.text == "Забрать со склада/продажа")
+async def delete_prompt(message: Message, state: FSMContext):
 
     await message.answer(
         f"Введите данные в формате:\n\n"
-        f"артикул␣размер␣кол-во␣место\n"
-        f"артикул␣размер␣кол-во␣место\n"
-        f"и т д**",
-        parse_mode='Markdown'
-    )
-    await state.set_state(AddStates.waiting_for_add_input)
+        f"артикул␣размер␣колличество\n"
+        f"артикул␣размер␣колличество\n"
+        f"и т д"
+        )
+
+    await state.set_state(DeleteStates.waiting_for_delete_input)
 
 
-@router_add_item.message(AddStates.waiting_for_add_input)
-async def process_add(message: Message, state: FSMContext):
+@router_delete_item.message(DeleteStates.waiting_for_delete_input)
+async def process_delete(message: Message, state: FSMContext):
+
     result = []
 
     for item in message.text.split('\n'):
 
-        if len(item.split()) == 4:
+        if len(item.split()) == 3:
 
-            article, size, quantity, location = item.split()
+            article, size, quantity = item.split()
 
-            check_param = [True if chek_params_integer(param) else False for param in (article, quantity, location)]
+            check_param = [True if chek_params_integer(param) else False for param in (article, quantity)]
             if not all(check_param):
                 result.append(
                     f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
@@ -45,35 +46,43 @@ async def process_add(message: Message, state: FSMContext):
                 )
                 continue
 
-            action, quantity, location = add_or_update_item(article, size, quantity, location)
+            action, article, quantity, remains_quantity = update_item_for_delete(article, size, quantity)
 
             if action == 'updated':
                 response = (
                     f"Запись обновлена: ✅\n\n"
                     f"Артикул: {article}\n"
                     f"Размер: {size}\n"
-                    f"Текущее кол-во: {quantity}\n"
-                    f"Место: {location}\n\n"
-                    f"Обрати внимание на место, место выбранно не то которое ты вводил, т.к данное панно уже присутствует на складе\n"
+                    f"Остаток на сладе: {quantity}\n"
+                    f"---------------------------------"
+                    )
+                result.append(response)
+
+            elif action == "partly updated":
+                response = (
+                    f"Запись обновлена: ✅\n\n"
+                    f"Артикул: {article}\n"
+                    f"Размер: {size}\n"
+                    f"Остаток на сладе: {quantity}\n"
+                    f"Недостаток {remains_quantity}\n"
                     f"---------------------------------"
                     )
                 result.append(response)
             else:
                 response = (
-                    f"Новая запись добавлена: ✅\n\n"
+                    f"Нет на складе ! ❌\n"
                     f"Артикул: {article}\n"
                     f"Размер: {size}\n"
-                    f"Текущее кол-во: {quantity}\n"
-                    f"Место: {location}\n"
                     f"---------------------------------"
-                    )
+                )
                 result.append(response)
+
         else:
             response = (
                 f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
                 f"Ошибка: формат ввода неверный.\n"
                 f"Введите данные в формате:\n"
-                f"артикул␣размер␣кол-во␣место"
+                f"артикул␣размер␣колличество"
             )
             result.append(response)
 
@@ -82,5 +91,6 @@ async def process_add(message: Message, state: FSMContext):
     await state.clear()
 
 
-def register_handlers_add_item(dp):
-    dp.include_router(router_add_item)
+
+def register_handlers_delete_item(dp):
+    dp.include_router(router_delete_item)
