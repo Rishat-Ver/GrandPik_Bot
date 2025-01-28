@@ -14,6 +14,8 @@ router_add_item = Router()
 @router_add_item.message(lambda message: message.text == "Добавить")
 async def add_prompt(message: Message, state: FSMContext):
 
+    await state.clear()
+
     await message.answer(
         f"Введите данные в формате:\n\n"
         f"артикул␣размер␣кол-во␣место\n"

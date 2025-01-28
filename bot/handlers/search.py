@@ -14,6 +14,8 @@ router_search = Router()
 @router_search.message(lambda message: message.text == "🔍")
 async def search_prompt(message: Message, state: FSMContext):
 
+    await state.clear()
+
     await message.answer(
         f"Введите данные в формате:\n\n"
         f"артикул␣размер\n"

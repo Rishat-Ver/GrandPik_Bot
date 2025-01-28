@@ -18,6 +18,9 @@ router_stats = Router()
 
 @router_stats.message(Command("stats"))
 async def process_start_command(message: Message, state: FSMContext):
+
+    await state.clear()
+    
     await message.answer(
         text='Статистика:\n\nВыберите , что хотели бы посмотреть',
         reply_markup=stats_keyboard
