@@ -7,16 +7,16 @@ def update_item_for_delete(article, size, quantity):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT id, quantity, sales
+        SELECT id, quantity, sales, location
           FROM warehouse
          WHERE article = ? AND size = ?
     """, (article, size))
     record = cursor.fetchone()
 
     if record:
-        item_id, current_quantity, current_sales = record
+        item_id, current_quantity, current_sales, location = record
         quantity = int(quantity)
-        
+
         if current_quantity >= quantity:
             new_quantity = current_quantity - quantity
             remains_quantity = quantity - current_quantity
@@ -30,7 +30,7 @@ def update_item_for_delete(article, size, quantity):
             connection.commit()
             connection.close()
 
-            return "updated", article, new_quantity, remains_quantity
+            return "updated", article, new_quantity, remains_quantity, location
         else:
             new_quantity = 0
             remains_quantity = quantity - current_quantity
@@ -44,7 +44,7 @@ def update_item_for_delete(article, size, quantity):
             connection.commit()
             connection.close()
 
-            return "partly updated", article, new_quantity, remains_quantity
+            return "partly updated", article, new_quantity, remains_quantity, location
     else:
         connection.close()
         return "Нечего забирать"

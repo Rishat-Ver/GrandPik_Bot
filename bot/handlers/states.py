@@ -11,3 +11,7 @@ class AddStates(StatesGroup):
 
 class DeleteStates(StatesGroup):
     waiting_for_delete_input = State()
+
+
+class StatsStates(StatesGroup):
+    waiting_for_stats_input = State()

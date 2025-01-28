@@ -11,7 +11,7 @@ from checkers.checker_params import chek_params_integer
 router_search = Router()
 
 
-@router_search.message(lambda message: message.text == "Найти")
+@router_search.message(lambda message: message.text == "🔍")
 async def search_prompt(message: Message, state: FSMContext):
 
     await message.answer(
@@ -57,7 +57,7 @@ async def process_search(message: Message, state: FSMContext):
                 result.append(
                     f'Артикул: {article}\n'
                     f'Размер: {size}\n'
-                    f'Нет такого тавара'
+                    f'Нет такого товара'
                     )
         else:
             result.append(

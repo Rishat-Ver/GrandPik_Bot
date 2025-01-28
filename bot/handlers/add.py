@@ -11,7 +11,7 @@ from checkers.checker_params import chek_params_integer
 router_add_item = Router()
 
 
-@router_add_item.message(lambda message: message.text == "Обновить/Добавить")
+@router_add_item.message(lambda message: message.text == "Добавить")
 async def add_prompt(message: Message, state: FSMContext):
 
     await message.answer(

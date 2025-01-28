@@ -11,7 +11,7 @@ from checkers.checker_params import chek_params_integer
 router_delete_item = Router()
 
 
-@router_delete_item.message(lambda message: message.text == "Забрать со склада/продажа")
+@router_delete_item.message(lambda message: message.text == "Забрать")
 async def delete_prompt(message: Message, state: FSMContext):
 
     await message.answer(
@@ -46,7 +46,7 @@ async def process_delete(message: Message, state: FSMContext):
                 )
                 continue
 
-            action, article, quantity, remains_quantity = update_item_for_delete(article, size, quantity)
+            action, article, quantity, remains_quantity, location = update_item_for_delete(article, size, quantity)
 
             if action == 'updated':
                 response = (
@@ -54,6 +54,7 @@ async def process_delete(message: Message, state: FSMContext):
                     f"Артикул: {article}\n"
                     f"Размер: {size}\n"
                     f"Остаток на сладе: {quantity}\n"
+                    f"Место на сладе: {location}\n"
                     f"---------------------------------"
                     )
                 result.append(response)
@@ -64,6 +65,7 @@ async def process_delete(message: Message, state: FSMContext):
                     f"Артикул: {article}\n"
                     f"Размер: {size}\n"
                     f"Остаток на сладе: {quantity}\n"
+                    f"Место на сладе: {location}\n"
                     f"Недостаток {remains_quantity}\n"
                     f"---------------------------------"
                     )
