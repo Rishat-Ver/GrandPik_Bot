@@ -11,17 +11,21 @@ from checkers.checker_params import chek_params_integer
 router_delete_item = Router()
 
 
+
 @router_delete_item.message(lambda message: message.text == "Забрать")
 async def delete_prompt(message: Message, state: FSMContext):
 
     await state.clear()
 
-    await message.answer(
+    response = (
         f"Введите данные в формате:\n\n"
         f"артикул␣размер␣колличество\n"
         f"артикул␣размер␣колличество\n"
-        f"и т д"
+        f"и т д\n"
+        f"---------------------------------"
         )
+
+    await message.answer(response)
 
     await state.set_state(DeleteStates.waiting_for_delete_input)
 
@@ -39,44 +43,40 @@ async def process_delete(message: Message, state: FSMContext):
 
             check_param = [True if chek_params_integer(param) else False for param in (article, quantity)]
             if not all(check_param):
+
                 result.append(
                     f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
                     f"Не корректно ввели данные\n"
                     f"для артикула {article}\n"
-                    f"Запись НЕ обновилась/добавилась\n"
                     f"---------------------------------"
                 )
                 continue
 
-            action, article, quantity, remains_quantity, location = update_item_for_delete(article, size, quantity)
+            action, article, quantity, location = update_item_for_delete(article, size, quantity)
 
             if action == 'updated':
                 response = (
-                    f"Запись обновлена: ✅\n\n"
-                    f"Артикул: {article}\n"
-                    f"Размер: {size}\n"
-                    f"Остаток на сладе: {quantity}\n"
-                    f"Место на сладе: {location}\n"
+                    f"✅\n"
+                    f"Панно: {article}  {size}\n\n"
+                    f"МЕСТО: {location}\n"
                     f"---------------------------------"
                     )
                 result.append(response)
 
-            elif action == "partly updated":
+            elif action == "no updated":
                 response = (
-                    f"Запись обновлена: ✅\n\n"
-                    f"Артикул: {article}\n"
-                    f"Размер: {size}\n"
-                    f"Остаток на сладе: {quantity}\n"
-                    f"Место на сладе: {location}\n"
-                    f"Недостаток {remains_quantity}\n"
+                    f"❌\n\n"
+                    f"Панно: {article}  {size}\n"
+                    f"Остаток на сладе: {quantity} шт.\n"
+                    f"НА СКЛАДЕ НЕТ СТОЛЬКО ПАННО\n"
                     f"---------------------------------"
                     )
                 result.append(response)
             else:
                 response = (
-                    f"Нет на складе ! ❌\n"
-                    f"Артикул: {article}\n"
-                    f"Размер: {size}\n"
+                    f"❌\n\n"
+                    f"Панно: {article}  {size}\n"
+                    f"НЕТ НА СКЛАДЕ !\n"
                     f"---------------------------------"
                 )
                 result.append(response)
@@ -85,12 +85,14 @@ async def process_delete(message: Message, state: FSMContext):
             response = (
                 f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
                 f"Ошибка: формат ввода неверный.\n"
-                f"Введите данные в формате:\n"
-                f"артикул␣размер␣колличество"
+                f"для артикула {article}\n"
+                f"---------------------------------"
             )
             result.append(response)
 
-    await message.reply('\n'.join(result), reply_markup=main_keyboard)
+
+
+    await message.answer('\n'.join(result), reply_markup=main_keyboard)
 
     await state.clear()
 

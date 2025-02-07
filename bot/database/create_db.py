@@ -2,7 +2,7 @@ import sqlite3
 
 
 def create_database():
-    connection = sqlite3.connect("GP_warehouse.db")
+    connection = sqlite3.connect("bot/database/GP_warehouse.db")
     cursor = connection.cursor()
 
     cursor.execute("""

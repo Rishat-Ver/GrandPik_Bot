@@ -20,15 +20,17 @@ router_stats = Router()
 async def process_start_command(message: Message, state: FSMContext):
 
     await state.clear()
-    
+
     await message.answer(
         text='Статистика:\n\nВыберите , что хотели бы посмотреть',
         reply_markup=stats_keyboard
     )
 
+    await state.set_state(StatsStates.waiting_for_stats_input)
+
 
 @router_stats.callback_query(F.data == 'Панно VS Продажи')
-async def send_sales_stats(callback: CallbackQuery):
+async def send_sales_stats(callback: CallbackQuery, state: FSMContext):
 
     await callback.answer()
 
@@ -69,7 +71,7 @@ async def send_sales_stats(callback: CallbackQuery):
 
     await callback.message.answer_photo(
         BufferedInputFile(buffer.getvalue(), filename="sales_stats_art_size.png"),
-        caption="Топ 20 Панно 🔝"
+        caption="Топ 20 Панно 📊"
     )
 
     await callback.message.answer(
@@ -77,9 +79,11 @@ async def send_sales_stats(callback: CallbackQuery):
         reply_markup=stats_keyboard
     )
 
+    await state.clear()
+
 
 @router_stats.callback_query(F.data == 'Артикул VS Продажи')
-async def send_sales_stats(callback: CallbackQuery):
+async def send_sales_stats(callback: CallbackQuery, state: FSMContext):
 
     await callback.answer()
 
@@ -119,7 +123,7 @@ async def send_sales_stats(callback: CallbackQuery):
 
     await callback.message.answer_photo(
         BufferedInputFile(buffer.getvalue(), filename="sales_stats_art.png"),
-        caption="Топ 20 артикул 🔝"
+        caption="Топ 20 артикул 📊"
     )
 
     await callback.message.answer(
@@ -127,9 +131,11 @@ async def send_sales_stats(callback: CallbackQuery):
         reply_markup=stats_keyboard
     )
 
+    await state.clear()
+
 
 @router_stats.callback_query(F.data == 'Размер VS Продажи')
-async def send_sales_stats(callback: CallbackQuery):
+async def send_sales_stats(callback: CallbackQuery, state: FSMContext):
 
     await callback.answer()
 
@@ -169,13 +175,15 @@ async def send_sales_stats(callback: CallbackQuery):
 
     await callback.message.answer_photo(
         BufferedInputFile(buffer.getvalue(), filename="sales_stats_size.png"),
-        caption="Топ 20 размеров 🔝"
+        caption="Топ 20 размеров 📊"
     )
 
     await callback.message.answer(
         text="\n\nЧто хотите посмотреть дальше?",
         reply_markup=stats_keyboard
     )
+
+    await state.clear()
 
 
 def registr_stats(dp):

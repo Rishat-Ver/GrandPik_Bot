@@ -18,7 +18,7 @@ def add_or_update_item(article, size, quantity, location):
 
     record = cursor.fetchone()
 
-    if record:
+    if record and record[4] != 0:
         item_id, article, size, current_quantity, current_location = record
         new_quantity = current_quantity + int(quantity)
 
@@ -31,6 +31,20 @@ def add_or_update_item(article, size, quantity, location):
         connection.close()
 
         return "updated", new_quantity, current_location
+
+    elif record and record[4] == 0:
+
+        new_quantity = current_quantity + int(quantity)
+
+        cursor.execute("""
+            UPDATE warehouse
+               SET quantity = ?, location = ? WHERE id = ?
+        """, (new_quantity, location, item_id))
+
+        connection.commit()
+        connection.close()
+
+        return "updated_location", new_quantity, location
     else:
 
         cursor.execute("""

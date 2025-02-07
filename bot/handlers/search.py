@@ -39,7 +39,7 @@ async def process_search(message: Message, state: FSMContext):
                 result.append(
                     f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
                     f"Не корректно ввели данные\n"
-                    f"Артикул - {article}\n"
+                    f"для артикула {article}\n"
                 )
                 continue
 
@@ -47,9 +47,8 @@ async def process_search(message: Message, state: FSMContext):
             if object:
                 result.append(
                     "\n".join([
-                        f"✅\n"
-                        f"Артикул: {item[1]}\n"
-                        f"Размер: {item[2]}\n"
+                        f"✅\n\n"
+                        f"Панно: {item[1]}  {item[2]}\n"
                         f"Кол-во: {item[3]}\n"
                         f"Место: {item[5]}"
                         for item in object
@@ -57,15 +56,15 @@ async def process_search(message: Message, state: FSMContext):
                 )
             else:
                 result.append(
-                    f'Артикул: {article}\n'
-                    f'Размер: {size}\n'
+                    f"❌\n\n"
+                    f"Панно: {article} {size}\n"
                     f'Нет такого товара'
                     )
         else:
             result.append(
                 f"❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️\n"
-                f'Формат данных неверный.\n'
-                f'Введите: артикул␣размер.'
+                f"Не корректно ввели данные\n"
+                f"для артикула {article}\n"
                 )
 
     await message.reply('\n---------------------------\n'.join(result), reply_markup=main_keyboard)
